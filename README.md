@@ -56,7 +56,7 @@ To train a new agent, open [Tennis.ipynb](https://github.com/jbagnato/deep-rl-mu
 
 Follow the steps described on each cell. 
 
-You will find a DDPG function that will train until ```np.mean(scores_deque)>=0.5```This means that the average score of the agent is greater than 0.5.
+You will find a MADDPG function that will train until ```np.mean(scores_deque)>=0.5```This means that the average score of the agent is greater than 0.5 over last 100 episodes.
 
 Then it will use saved agent in both files 'checkpoint_actor0.pth' and 'checkpoint_critic0.pth' to run a continuous episode that you can enjoy in realtime :-)
 
