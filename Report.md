@@ -18,17 +18,17 @@ I took a previous code from "Physical Deception" problem and modified it to make
 
 To solve the problem I made some modifications on code:
 
-* Episode Max length was gradually incremented over time and limit to 150.000
-* Add Noise parameter set to False
-* Neural Networks with layers of 200 and 100 hidden units.
-* Agent learn method (with soft update) called every 7 steps.
-* Actor and critic Learning rates of 1e-3 and 1e-4
+* Limit of maximum score over episodes so that the agent don't repeat same moves always, like if the agent learn how to cheat on the game!
+* The 2 Agents share the critic, this makes it learn faster
+* Neural Networks with layers of 128 and 100 hidden units.
+* Agent learn method (with soft update) called every 1 steps and learns 3 times.
+* Actor and critic Learning rates of 1e-4 and 3e-4
 
-After all those modifications and testing in CPU and GPU environments I could reach AVG of +30.0 (over last 100 episodes) after 563 episodes.
+After all those modifications and testing in CPU in Windows, Mac and Linux environments I could reach AVG of +0.5 (over last 100 episodes) after 1151 episodes.
 
 ### MADDPG Algorithm
 
-Multi Agent Deep Deterministic Policy Gradient (MADDPG) is an algorithm which concurrently learns a Q-function and a policy. It uses off-policy data and the Bellman equation to learn the Q-function, and uses the Q-function to learn the policy.
+Multi Agent Deep Deterministic Policy Gradient (MADDPG) (adaptation of DDPG algorithm) is an algorithm which concurrently learns a Q-function and a policy. It uses off-policy data and the Bellman equation to learn the Q-function, and uses the Q-function to learn the policy.
 
 - DDPG is an off-policy algorithm.
 - DDPG can only be used for environments with continuous action spaces.
@@ -40,36 +40,46 @@ Multi Agent Deep Deterministic Policy Gradient (MADDPG) is an algorithm which co
 The hyperparameters used were:
 
 ```xml
+LR_ACTOR = 1e-4         # learning rate of the actor
+LR_CRITIC = 3e-4        # learning rate of the critic
+WEIGHT_DECAY = 0        # L2 weight decay 0
+
+NOISE_REDUCTION_RATE = 0.99
+EPISODES_BEFORE_LEARNING = 400
+NOISE_START=1.0
+NOISE_END=0.1
+
 BUFFER_SIZE = int(1e5)  # replay buffer size
-BATCH_SIZE = 128        # minibatch size
+BATCH_SIZE = 200        # minibatch size
+
 GAMMA = 0.99            # discount factor
-TAU = 1e-3              # for soft update of target parameters
-LR_ACTOR = 1e-3         # learning rate of the actor
-LR_CRITIC = 1e-4        # learning rate of the critic
-WEIGHT_DECAY = 0        # L2 weight decay
+TAU = 1e-3              # for soft update of target parameters (1)
+
 ```
 
 
 ### Neural Networks
 
-There were used 2 NN for Actor and Critic models. The architecture used was the same:
+There were used 2 NN for Actor and 1 Critic (shared) models. The architecture used was:
 
 #### Actor NN
 
-- Hidden: (input, 200) - ReLU
-- Hidden: (200, 100) - ReLU
-- Output: (100, 4) - TanH
+- Hidden: (input, 128) - ReLU
+- Hidden: (128, 100) - ReLU
+- Output: (100, 2) - TanH
+- Applies Batch Normalization
 
 #### Critic NN
 
-- Hidden: (input, 200) - ReLU
-- Hidden: (200 + action_size, 100) - ReLU
-- Output: (100, 1) - Linear
+- Hidden: (input, 128) - ReLU
+- Hidden: (128 + action_size, 96) - ReLU
+- Output: (96, 1) - Linear
+- Applies Batch Normalization
 
 
 ## Plot of Rewards
 
-To solve the problem, the agent receives an average reward (over 100 episodes) of at least +30:
+To solve the problem, the agent receives an average reward (over 100 episodes) of at least +0.5:
 
 ```xml
 0 episode	avg score over 100 episodes 0.10000	 (max 0.10000)
@@ -97,8 +107,5 @@ Rewards plot image:
 
 On future work It would be great to use other RL models like:
 
-* D4PG
-* Try on the Version 2 Agent with 20 arms envornment.
-* Try the Crawler optional excercise.
-
-
+* Try Alpha Zero.
+* Try the "Play Soccer" optional excercise.
